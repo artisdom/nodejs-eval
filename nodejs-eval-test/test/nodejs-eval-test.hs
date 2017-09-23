@@ -5,11 +5,12 @@ module Main
   ( main
   ) where
 
+import Control.Exception
 import Language.JavaScript.NodeJS.Splices
 
 main :: IO ()
 main = do
-  (f, t) <- $(splice)
-  r <- f "1+1"
-  print r
-  t
+  (eval, quit) <- $(splice)
+  flip finally quit $ do
+    result <- eval "1 + 1"
+    print result

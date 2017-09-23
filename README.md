@@ -26,15 +26,26 @@ main :: IO ()
 main = defaultMainWithEvalServer $ addDependencies [("left-pad", "^1.1.3")]
 ```
 
-Then, add `nodejs-eval` as a regular dependency. Enable `TemplateHaskell` extension, then you can execute Node.js scripts like this:
+Then, add `nodejs-eval` as a regular dependency. You can execute Node.js scripts like this:
 
 ```haskell
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TemplateHaskell #-}
+
+import Control.Exception
 import Language.JavaScript.NodeJS.Splices
 
-initEvalServer :: IO (T.Text -> IO Value, IO ())
+initEvalServer :: IO (Text -> IO Value, IO ())
 initEvalServer = $(splice)
+
+onePlusOne :: IO ()
+onePlusOne = do
+  (eval, quit) <- initEvalServer
+  flip finally quit $ do
+    result <- eval "1 + 1"
+    print result
 ```
 
-Now, executing `initEvalServer` will start the eval server. Two continuations are returned, the first one accepts a Node.js script, and returns the evaluation result as a `Data.Aeson.Value`. Evaluation failure will raise an exception. The second continuation will terminate the eval server.
+Now, executing `initEvalServer` will start the eval server. Two continuations are returned, the first one accepts a Node.js script, and returns the evaluation result as a `Data.Aeson.Value`. Evaluation failure will raise an exception. The second continuation will terminate the eval server. Use `bracket` or similar function to make sure the finalizer is invoked even in case of exception, to prevent dangling `node` processes.
 
 See [`nodejs-eval-test`](nodejs-eval-test) for a complete demo.
