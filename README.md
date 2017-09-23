@@ -80,7 +80,7 @@ import Data.Aeson
 import Quoter
 
 answer :: Value
-answer = [| 6 * 7 |]
+answer = [js| 6 * 7 |]
 ```
 
 See [`nodejs-eval-test`](nodejs-eval-test) for a complete demo.
