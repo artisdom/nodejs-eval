@@ -10,7 +10,7 @@ import Language.JavaScript.NodeJS.Splices
 
 main :: IO ()
 main = do
-  (eval, quit) <- $(splice)
+  (eval, quit) <- $(makeEval)
   flip finally quit $ do
     two <- eval "let two = 1 + 1; two"
     print two

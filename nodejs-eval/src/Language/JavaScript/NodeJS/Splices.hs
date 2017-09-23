@@ -1,8 +1,8 @@
 {-# LANGUAGE TemplateHaskell #-}
 
 module Language.JavaScript.NodeJS.Splices
-  ( splice
-  , typedSplice
+  ( makeEval
+  , makeEvalTyped
   ) where
 
 import Data.Aeson
@@ -17,8 +17,8 @@ import Network.HTTP.Types
 import System.FilePath
 import System.Process
 
-splice :: Q Exp
-splice =
+makeEval :: Q Exp
+makeEval =
   [|do (_, Just h_stdout, _, h) <-
          createProcess
            ((proc "node" ["server.js"])
@@ -55,5 +55,5 @@ splice =
                _ -> fail $ "illegal response: " ++ show resp
          , terminateProcess h)|]
 
-typedSplice :: Q (TExp (IO (T.Text -> IO Value, IO ())))
-typedSplice = unsafeTExpCoerce splice
+makeEvalTyped :: Q (TExp (IO (T.Text -> IO Value, IO ())))
+makeEvalTyped = unsafeTExpCoerce makeEval

@@ -36,7 +36,7 @@ import Control.Exception
 import Language.JavaScript.NodeJS.Splices
 
 initEvalServer :: IO (Text -> IO Value, IO ())
-initEvalServer = $(splice)
+initEvalServer = $(makeEval)
 
 onePlusOne :: IO ()
 onePlusOne = do
