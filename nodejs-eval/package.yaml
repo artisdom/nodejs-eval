@@ -33,7 +33,7 @@ dependencies:
   - Cabal
   - directory
   - filepath
-  - http-conduit
+  - http-client
   - http-types
   - process
   - template-haskell
