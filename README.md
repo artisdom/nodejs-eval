@@ -46,6 +46,8 @@ onePlusOne = do
     print result
 ```
 
-Now, executing `initEvalServer` will start the eval server. Two continuations are returned, the first one accepts a Node.js script, and returns the evaluation result as a `Data.Aeson.Value`. Evaluation failure will raise an exception. The second continuation will terminate the eval server. Use `bracket` or similar function to make sure the finalizer is invoked even in case of exception, to prevent dangling `node` processes.
+Now, executing `initEvalServer` will start the eval server. Two continuations are returned, the first one accepts a Node.js script, and returns the evaluation result as a `Data.Aeson.Value`. Evaluation failure will raise an exception. A eval server has a single V8 execution context, and bindings are shared across `eval` calls. `require` is available.
+
+The second continuation will terminate the eval server. Remember to use `bracket` or similar function to make sure the finalizer is invoked even in case of exception, to prevent dangling `node` processes.
 
 See [`nodejs-eval-test`](nodejs-eval-test) for a complete demo.

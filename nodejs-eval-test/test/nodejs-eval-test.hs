@@ -12,5 +12,9 @@ main :: IO ()
 main = do
   (eval, quit) <- $(splice)
   flip finally quit $ do
-    result <- eval "1 + 1"
-    print result
+    two <- eval "let two = 1 + 1; two"
+    print two
+    two' <- eval "two"
+    print two'
+    tmpdir <- eval "require('os').tmpdir()"
+    print tmpdir
