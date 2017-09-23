@@ -8,6 +8,7 @@ module Language.JavaScript.NodeJS.Splices
 import Data.Aeson
 import qualified Data.HashMap.Strict as HM
 import qualified Data.Text as T
+import GHC.IO.Handle
 import Language.Haskell.TH.Syntax
 import Language.JavaScript.NodeJS.CabalHook.Splices
 import Network.HTTP.Simple
@@ -17,19 +18,22 @@ import System.Process
 
 splice :: Q Exp
 splice =
-  [|do (_, _, _, h) <-
+  [|do (_, Just h_stdout, _, h) <-
          createProcess
-           ((proc "node" ["server.js", "--port", "23333"])
-            {cwd = Just ($(datadirQ) </> "jsbits")})
+           ((proc "node" ["server.js"])
+            {cwd = Just ($(datadirQ) </> "jsbits"), std_out = CreatePipe})
+       port_line <- hGetLine h_stdout
+       initReq <- parseRequest "http://localhost/eval"
+       let req =
+             setRequestMethod methodPost $
+             setRequestPort (read port_line) initReq
        pure
          ( \code -> do
-             initReq <- parseRequest "http://localhost:23333/eval"
              resp <-
                httpJSON $
-               setRequestMethod methodPost $
                setRequestBodyJSON
                  (Object $ HM.singleton (T.pack "code") (String code))
-                 initReq
+                 req
              case getResponseBody resp of
                Object obj ->
                  case HM.lookup (T.pack "success") obj of

@@ -13,4 +13,6 @@ app.post("/eval", (req, res) => {
     }
 });
 
-app.listen(require("minimist")(process.argv.slice(2)).port);
+const server = app.listen(0, "localhost", () => {
+    console.log(server.address().port)
+});

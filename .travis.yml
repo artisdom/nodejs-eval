@@ -6,6 +6,9 @@ git:
 cache:
   directories:
     - $HOME/.stack/
+    - $TRAVIS_BUILD_DIR/.stack-work
+    - $TRAVIS_BUILD_DIR/nodejs-eval/.stack-work
+    - $TRAVIS_BUILD_DIR/nodejs-eval-test/.stack-work
 
 matrix:
   include:
