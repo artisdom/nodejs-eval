@@ -12,6 +12,7 @@ ghc-options: -Wall
 dependencies:
   - base
   - nodejs-eval
+  - template-haskell
 
 tests:
   nodejs-eval-test:

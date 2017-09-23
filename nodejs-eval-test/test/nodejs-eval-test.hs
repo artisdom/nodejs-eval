@@ -1,4 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE QuasiQuotes #-}
 {-# LANGUAGE TemplateHaskell #-}
 
 module Main
@@ -7,6 +8,7 @@ module Main
 
 import Control.Exception
 import Language.JavaScript.NodeJS.Splices
+import Quoter
 
 main :: IO ()
 main = do
@@ -18,3 +20,5 @@ main = do
     print two'
     tmpdir <- eval "require('os').tmpdir()"
     print tmpdir
+    let answer = [js| 6 * 7 |]
+    print answer

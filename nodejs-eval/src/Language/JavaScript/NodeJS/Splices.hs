@@ -3,6 +3,8 @@
 module Language.JavaScript.NodeJS.Splices
   ( makeEval
   , makeEvalTyped
+  , makeQuoter
+  , makeQuoterTyped
   ) where
 
 import Data.Aeson
@@ -10,6 +12,7 @@ import qualified Data.ByteString.Char8 as BS
 import qualified Data.HashMap.Strict as HM
 import qualified Data.Text as T
 import GHC.IO.Handle
+import Language.Haskell.TH.Quote
 import Language.Haskell.TH.Syntax
 import Language.JavaScript.NodeJS.CabalHook.Splices
 import Network.HTTP.Client
@@ -57,3 +60,27 @@ makeEval =
 
 makeEvalTyped :: Q (TExp (IO (T.Text -> IO Value, IO ())))
 makeEvalTyped = unsafeTExpCoerce makeEval
+
+makeQuoter :: Q Exp
+makeQuoter =
+  [|QuasiQuoter
+    { quoteExp =
+        \code -> do
+          r <- qGetQ
+          eval <-
+            case r of
+              Just eval -> pure eval
+              _ -> do
+                (eval, quit) <- runIO $(makeEval)
+                qAddModFinalizer $ runIO quit
+                qPutQ eval
+                pure eval
+          r' <- runIO $ eval $ T.pack code
+          lift r'
+    , quotePat = undefined
+    , quoteType = undefined
+    , quoteDec = undefined
+    }|]
+
+makeQuoterTyped :: Q (TExp QuasiQuoter)
+makeQuoterTyped = unsafeTExpCoerce makeQuoter
